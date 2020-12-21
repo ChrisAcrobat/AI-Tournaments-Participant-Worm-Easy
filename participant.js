@@ -1,0 +1,3 @@
+onmessage = messageEvent => {
+	postMessage(/*Response*/);
+}
