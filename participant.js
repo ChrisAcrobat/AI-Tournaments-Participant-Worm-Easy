@@ -1,23 +1,23 @@
 'use strict'
-let right = 1;
-let team;
-let settings;
-let opponents;
-ParticipantHelper.init = data => {
-	team = data.opponents.findIndex(opponent=>opponent===null);
-	settings = data.settings;
-	opponents = data.opponents;
-	console.log(settings);
-	console.log(opponents);
+let _right = 1;
+let _team;
+let _settings;
+let _opponents;
+ParticipantHelper.init = (settings, opponents) => {
+	_team = opponents.findIndex(opponent=>opponent===null);
+	_settings = settings;
+	_opponents = opponents;
+	console.log(_settings);
+	console.log(_opponents);
 }
 ParticipantHelper.onmessage = data => {
-	if(right){
-		let max = data.message.length-1;
+	if(_right){
+		let max = data.length-1;
 		let mid = max/2;
 		let teamForward;
 		let teamLeft;
 		let teamRight;
-		switch(team){
+		switch(_team){
 			case 0:
 				teamForward = 1;
 				teamLeft = 2;
@@ -39,22 +39,22 @@ ParticipantHelper.onmessage = data => {
 				teamRight = 1;
 				break;
 		}
-		let teamCorrect = team === data.message[mid][0].occupiedBy.team;
-		let teamForwardCorrect = teamForward === data.message[mid][max].occupiedBy.team;
+		let teamCorrect = _team === data[mid][0].occupiedBy.team;
+		let teamForwardCorrect = teamForward === data[mid][max].occupiedBy.team;
 		let teamLeftCorrect = true;
 		let teamRightCorrect = true;
-		if(2 < opponents.length){
-			teamLeftCorrect = teamLeft === data.message[0][mid].occupiedBy.team;
-			teamRightCorrect = teamRight === data.message[max][mid].occupiedBy.team;
+		if(2 < _opponents.length){
+			teamLeftCorrect = teamLeft === data[0][mid].occupiedBy.team;
+			teamRightCorrect = teamRight === data[max][mid].occupiedBy.team;
 		}
 		if(!teamCorrect || !teamForwardCorrect || !teamLeftCorrect || !teamRightCorrect){
-			console.log('team('+team+'): '+teamCorrect+'\n'+
+			console.log('team('+_team+'): '+teamCorrect+'\n'+
 			'teamForward: '+teamForward+', '+teamForwardCorrect+'\n'+
 			'teamLeft: '+teamLeft + ', ' +teamLeftCorrect+'\n'+
 			'teamRight: '+teamRight + ', ' +teamRightCorrect);
 			debugger;
 		}
 	}
-	ParticipantHelper.respond(right);
-	right = 0;
+	ParticipantHelper.respond(_right);
+	_right = 0;
 }
