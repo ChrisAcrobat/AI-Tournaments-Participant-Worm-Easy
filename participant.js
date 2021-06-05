@@ -24,6 +24,11 @@ ParticipantHelper.init = (settings, opponents) => {
 	_opponents = opponents;
 }
 ParticipantHelper.onmessage = data => {
+	if(_tick === 0){
+		let max = data.length-1;
+		let mid = max/2;
+		_pos = [mid, 0];
+	}
 	if(_target === null || !data[_target.pos_x][_target.pos_y].eatables.apple){
 		let eatables = [];
 		data.forEach((column, x) => {
