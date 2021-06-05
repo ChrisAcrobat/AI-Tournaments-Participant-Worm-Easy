@@ -23,11 +23,67 @@ ParticipantHelper.init = (settings, opponents) => {
 	_settings = settings;
 	_opponents = opponents;
 }
+function isSpaceOpen(data, x, y){
+	let column = data[x];
+	if(column === undefined){
+		return false;
+	}else{
+		let space = column[y];
+		return space !== undefined && space.occupiedBy === null;
+	}
+}
 ParticipantHelper.onmessage = data => {
 	if(_tick === 0){
 		let max = data.length-1;
 		let mid = max/2;
 		_pos = [mid, 0];
+	}
+	let possibleResponses = [];
+	switch(_directions.current){
+		case _directions.UP:
+			if(isSpaceOpen(data, _pos[0], _pos[1]+1)){
+				possibleResponses.push(_responses.FORWARD);
+			}
+			if(isSpaceOpen(data, _pos[0]-1, _pos[1])){
+				possibleResponses.push(_responses.LEFT);
+			}
+			if(isSpaceOpen(data, _pos[0]+1, _pos[1])){
+				possibleResponses.push(_responses.RIGHT);
+			}
+			break;
+		case _directions.DOWN:
+			if(isSpaceOpen(data, _pos[0], _pos[1]-1)){
+				possibleResponses.push(_responses.FORWARD);
+			}
+			if(isSpaceOpen(data, _pos[0]+1, _pos[1])){
+				possibleResponses.push(_responses.LEFT);
+			}
+			if(isSpaceOpen(data, _pos[0]-1, _pos[1])){
+				possibleResponses.push(_responses.RIGHT);
+			}
+			break;
+		case _directions.LEFT:
+			if(isSpaceOpen(data, _pos[0]-1, _pos[1])){
+				possibleResponses.push(_responses.FORWARD);
+			}
+			if(isSpaceOpen(data, _pos[0], _pos[1]-1)){
+				possibleResponses.push(_responses.LEFT);
+			}
+			if(isSpaceOpen(data, _pos[0], _pos[1]+1)){
+				possibleResponses.push(_responses.RIGHT);
+			}
+			break;
+		case _directions.RIGHT:
+			if(isSpaceOpen(data, _pos[0]+1, _pos[1])){
+				possibleResponses.push(_responses.FORWARD);
+			}
+			if(isSpaceOpen(data, _pos[0], _pos[1]+1)){
+				possibleResponses.push(_responses.LEFT);
+			}
+			if(isSpaceOpen(data, _pos[0], _pos[1]-1)){
+				possibleResponses.push(_responses.RIGHT);
+			}
+			break;
 	}
 	if(_target === null || !data[_target.pos_x][_target.pos_y].eatables.apple){
 		let eatables = [];
@@ -107,6 +163,9 @@ ParticipantHelper.onmessage = data => {
 					break;
 			}
 		}
+	}
+	if(!possibleResponses.includes(response) && 0 < possibleResponses.length){
+		response = possibleResponses[Math.floor(Math.random()*possibleResponses.length)];
 	}
 	ParticipantHelper.respond(response);
 	switch(response){
