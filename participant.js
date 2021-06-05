@@ -101,7 +101,7 @@ ParticipantHelper.onmessage = data => {
 	//	debugger;
 	//	console.debug({..._pos, distance: _target.distance});
 	}
-	if(dx !== 0 && Math.abs(dx) < Math.abs(dy)){
+	if(dx !== 0 && Math.abs(dy) < Math.abs(dx)){
 		if(0 < dx){
 			switch(_directions.current){
 				case _directions.UP:
