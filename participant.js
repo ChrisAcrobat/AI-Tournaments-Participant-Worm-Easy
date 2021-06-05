@@ -5,7 +5,7 @@ let _settings;
 let _opponents;
 let _pos;
 let _tick = 0;
-let _response = {
+let _responses = {
 	FORWARD: 0,
 	LEFT: -1,
 	RIGHT: 1,
@@ -44,20 +44,20 @@ ParticipantHelper.onmessage = data => {
 		});
 		_target = eatables[Math.floor(Math.random()*eatables.length)];
 	}
-	let response = _response.FORWARD;
+	let response = _responses.FORWARD;
 	let dx = _target.pos_x-_pos[0];
 	let dy = _target.pos_y-_pos[1];
 	if(dx !== 0 && Math.abs(dy) < Math.abs(dx)){
 		if(0 < dx){
 			switch(_directions.current){
 				case _directions.UP:
-					response = _response.RIGHT;
+					response = _responses.RIGHT;
 					break;
 				case _directions.DOWN:
-					response = _response.LEFT;
+					response = _responses.LEFT;
 					break;
 				case _directions.LEFT:
-					response = Math.round(Math.random()) === 0 ? _response.LEFT : _response.RIGHT;
+					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 					break;
 				default:
 					break;
@@ -65,13 +65,13 @@ ParticipantHelper.onmessage = data => {
 		}else{
 			switch(_directions.current){
 				case _directions.UP:
-					response = _response.LEFT;
+					response = _responses.LEFT;
 					break;
 				case _directions.DOWN:
-					response = _response.RIGHT;
+					response = _responses.RIGHT;
 					break;
 				case _directions.RIGHT:
-					response = Math.round(Math.random()) === 0 ? _response.LEFT : _response.RIGHT;
+					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 					break;
 				default:
 					break;
@@ -81,13 +81,13 @@ ParticipantHelper.onmessage = data => {
 		if(0 < dy){
 			switch(_directions.current){
 				case _directions.DOWN:
-					response = Math.round(Math.random()) === 0 ? _response.LEFT : _response.RIGHT;
+					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 					break;
 				case _directions.LEFT:
-					response = _response.RIGHT;
+					response = _responses.RIGHT;
 					break;
 				case _directions.RIGHT:
-					response = _response.LEFT;
+					response = _responses.LEFT;
 					break;
 				default:
 					break;
@@ -95,13 +95,13 @@ ParticipantHelper.onmessage = data => {
 		}else{
 			switch(_directions.current){
 				case _directions.UP:
-					response = Math.round(Math.random()) === 0 ? _response.LEFT : _response.RIGHT;
+					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 					break;
 				case _directions.LEFT:
-					response = _response.LEFT;
+					response = _responses.LEFT;
 					break;
 				case _directions.RIGHT:
-					response = _response.RIGHT;
+					response = _responses.RIGHT;
 					break;
 				default:
 					break;
@@ -110,7 +110,7 @@ ParticipantHelper.onmessage = data => {
 	}
 	ParticipantHelper.respond(response);
 	switch(response){
-		case _response.LEFT:
+		case _responses.LEFT:
 			switch(_directions.current){
 				case _directions.UP: _directions.current = _directions.LEFT; break;
 				case _directions.DOWN: _directions.current = _directions.RIGHT; break;
@@ -118,7 +118,7 @@ ParticipantHelper.onmessage = data => {
 				case _directions.RIGHT: _directions.current = _directions.UP; break;
 			}
 			break;
-		case _response.RIGHT:
+		case _responses.RIGHT:
 			switch(_directions.current){
 				case _directions.UP: _directions.current = _directions.RIGHT; break;
 				case _directions.DOWN: _directions.current = _directions.LEFT; break;
