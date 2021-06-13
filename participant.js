@@ -101,66 +101,68 @@ ParticipantHelper.onmessage = data => {
 		_target = eatables[Math.floor(Math.random()*eatables.length)];
 	}
 	let response = _responses.FORWARD;
-	let dx = _target.pos_x-_pos[0];
-	let dy = _target.pos_y-_pos[1];
-	if(dx !== 0 && Math.abs(dy) < Math.abs(dx)){
-		if(0 < dx){
-			switch(_directions.current){
-				case _directions.UP:
-					response = _responses.RIGHT;
-					break;
-				case _directions.DOWN:
-					response = _responses.LEFT;
-					break;
-				case _directions.LEFT:
-					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
-					break;
-				default:
-					break;
+	if(_target){
+		let dx = _target.pos_x-_pos[0];
+		let dy = _target.pos_y-_pos[1];
+		if(dx !== 0 && Math.abs(dy) < Math.abs(dx)){
+			if(0 < dx){
+				switch(_directions.current){
+					case _directions.UP:
+						response = _responses.RIGHT;
+						break;
+					case _directions.DOWN:
+						response = _responses.LEFT;
+						break;
+					case _directions.LEFT:
+						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						break;
+					default:
+						break;
+				}
+			}else{
+				switch(_directions.current){
+					case _directions.UP:
+						response = _responses.LEFT;
+						break;
+					case _directions.DOWN:
+						response = _responses.RIGHT;
+						break;
+					case _directions.RIGHT:
+						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						break;
+					default:
+						break;
+				}
 			}
 		}else{
-			switch(_directions.current){
-				case _directions.UP:
-					response = _responses.LEFT;
-					break;
-				case _directions.DOWN:
-					response = _responses.RIGHT;
-					break;
-				case _directions.RIGHT:
-					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
-					break;
-				default:
-					break;
-			}
-		}
-	}else{
-		if(0 < dy){
-			switch(_directions.current){
-				case _directions.DOWN:
-					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
-					break;
-				case _directions.LEFT:
-					response = _responses.RIGHT;
-					break;
-				case _directions.RIGHT:
-					response = _responses.LEFT;
-					break;
-				default:
-					break;
-			}
-		}else{
-			switch(_directions.current){
-				case _directions.UP:
-					response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
-					break;
-				case _directions.LEFT:
-					response = _responses.LEFT;
-					break;
-				case _directions.RIGHT:
-					response = _responses.RIGHT;
-					break;
-				default:
-					break;
+			if(0 < dy){
+				switch(_directions.current){
+					case _directions.DOWN:
+						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						break;
+					case _directions.LEFT:
+						response = _responses.RIGHT;
+						break;
+					case _directions.RIGHT:
+						response = _responses.LEFT;
+						break;
+					default:
+						break;
+				}
+			}else{
+				switch(_directions.current){
+					case _directions.UP:
+						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						break;
+					case _directions.LEFT:
+						response = _responses.LEFT;
+						break;
+					case _directions.RIGHT:
+						response = _responses.RIGHT;
+						break;
+					default:
+						break;
+				}
 			}
 		}
 	}
