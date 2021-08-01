@@ -85,7 +85,7 @@ ParticipantHelper.onmessage = data => {
 			}
 			break;
 	}
-	if(_target === null || !data[_target.pos_x][_target.pos_y].eatables.apple){
+	if(!_target || !data[_target.pos_x][_target.pos_y].eatables.apple){
 		let eatables = [];
 		data.forEach((column, x) => {
 			column.forEach((space, y) => {
