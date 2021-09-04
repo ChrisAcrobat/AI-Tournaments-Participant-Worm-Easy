@@ -20,14 +20,18 @@ ParticipantHelper.init = (settings, opponents) => {
 	_settings = settings;
 	_opponents = opponents;
 }
-function isSpaceOpen(data, x, y){
-	let column = data[x];
-	if(column === undefined){
-		return false;
-	}else{
-		let space = column[y];
-		return space !== undefined && space.occupiedBy === null;
+function isSpaceOpen(data, x, y, z){
+	let layer = data[z];
+	if(layer){
+		let column = layer[x];
+		if(column){
+			let space = column[y];
+			if(space){
+				return space.occupiedBy === null;
+			}
+		}
 	}
+	return false;
 }
 ParticipantHelper.onmessage = message => {
 //	ParticipantHelper.onmessage = message => {
@@ -48,51 +52,23 @@ ParticipantHelper.onmessage = message => {
 		};
 	}
 	let possibleResponses = [];
-	switch(_currentDirection){
-		case _responses.UP:
-			if(isSpaceOpen(data, _pos.x, _pos.y+1)){
-				possibleResponses.push(_responses.FORWARD);
-			}
-			if(isSpaceOpen(data, _pos.x-1, _pos.y)){
-				possibleResponses.push(_responses.LEFT);
-			}
-			if(isSpaceOpen(data, _pos.x+1, _pos.y)){
-				possibleResponses.push(_responses.RIGHT);
-			}
-			break;
-		case _responses.DOWN:
-			if(isSpaceOpen(data, _pos.x, _pos.y-1)){
-				possibleResponses.push(_responses.FORWARD);
-			}
-			if(isSpaceOpen(data, _pos.x+1, _pos.y)){
-				possibleResponses.push(_responses.LEFT);
-			}
-			if(isSpaceOpen(data, _pos.x-1, _pos.y)){
-				possibleResponses.push(_responses.RIGHT);
-			}
-			break;
-		case _responses.LEFT:
-			if(isSpaceOpen(data, _pos.x-1, _pos.y)){
-				possibleResponses.push(_responses.FORWARD);
-			}
-			if(isSpaceOpen(data, _pos.x, _pos.y-1)){
-				possibleResponses.push(_responses.LEFT);
-			}
-			if(isSpaceOpen(data, _pos.x, _pos.y+1)){
-				possibleResponses.push(_responses.RIGHT);
-			}
-			break;
-		case _responses.RIGHT:
-			if(isSpaceOpen(data, _pos.x+1, _pos.y)){
-				possibleResponses.push(_responses.FORWARD);
-			}
-			if(isSpaceOpen(data, _pos.x, _pos.y+1)){
-				possibleResponses.push(_responses.LEFT);
-			}
-			if(isSpaceOpen(data, _pos.x, _pos.y-1)){
-				possibleResponses.push(_responses.RIGHT);
-			}
-			break;
+	if(_currentDirection !== _responses.BACKWARDS && isSpaceOpen(data, _pos.x, _pos.y+1, _pos.z)){
+		possibleResponses.push(_responses.FORWARD);
+	}
+	if(_currentDirection !== _responses.FORWARD && isSpaceOpen(data, _pos.x, _pos.y-1, _pos.z)){
+		possibleResponses.push(_responses.BACKWARDS);
+	}
+	if(_currentDirection !== _responses.LEFT && isSpaceOpen(data, _pos.x+1, _pos.y, _pos.z)){
+		possibleResponses.push(_responses.RIGHT);
+	}
+	if(_currentDirection !== _responses.RIGHT && isSpaceOpen(data, _pos.x-1, _pos.y, _pos.z)){
+		possibleResponses.push(_responses.LEFT);
+	}
+	if(_currentDirection !== _responses.DOWN && isSpaceOpen(data, _pos.x, _pos.y, _pos.z+1)){
+		possibleResponses.push(_responses.UP);
+	}
+	if(_currentDirection !== _responses.UP && isSpaceOpen(data, _pos.x, _pos.y, _pos.z-1)){
+		possibleResponses.push(_responses.DOWN);
 	}
 	if(!_target || !data[_target.pos_z][_target.pos_x][_target.pos_y].eatables.apple){
 		let eatables = [];
@@ -111,37 +87,36 @@ ParticipantHelper.onmessage = message => {
 		});
 		_target = eatables[Math.floor(Math.random()*eatables.length)];
 	}
-	let response = _responses.FORWARD;
-	if(_team===2){debugger}
 	if(_target){
 		let dx = _target.pos_x-_pos.x;
 		let dy = _target.pos_y-_pos.y;
 		let dz = _target.pos_z-_pos.z;
+		if(_team===0){debugger}
 		if(dx !== 0 && Math.abs(dy) < Math.abs(dx)){
 			if(0 < dx){
 				switch(_currentDirection){
-					case _responses.UP:
-						response = _responses.RIGHT;
+					case _responses.FORWARD:
+						_currentDirection = _responses.RIGHT;
 						break;
-					case _responses.DOWN:
-						response = _responses.LEFT;
+					case _responses.BACKWARDS:
+						_currentDirection = _responses.LEFT;
 						break;
 					case _responses.LEFT:
-						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						_currentDirection = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 						break;
 					default:
 						break;
 				}
 			}else{
 				switch(_currentDirection){
-					case _responses.UP:
-						response = _responses.LEFT;
+					case _responses.FORWARD:
+						_currentDirection = _responses.LEFT;
 						break;
-					case _responses.DOWN:
-						response = _responses.RIGHT;
+					case _responses.BACKWARDS:
+						_currentDirection = _responses.RIGHT;
 						break;
 					case _responses.RIGHT:
-						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+						_currentDirection = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 						break;
 					default:
 						break;
@@ -150,28 +125,28 @@ ParticipantHelper.onmessage = message => {
 		}else{
 			if(0 < dy){
 				switch(_currentDirection){
-					case _responses.DOWN:
-						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+					case _responses.BACKWARDS:
+						_currentDirection = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 						break;
 					case _responses.LEFT:
-						response = _responses.RIGHT;
+						_currentDirection = _responses.RIGHT;
 						break;
 					case _responses.RIGHT:
-						response = _responses.LEFT;
+						_currentDirection = _responses.LEFT;
 						break;
 					default:
 						break;
 				}
 			}else{
 				switch(_currentDirection){
-					case _responses.UP:
-						response = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
+					case _responses.FORWARD:
+						_currentDirection = Math.round(Math.random()) === 0 ? _responses.LEFT : _responses.RIGHT;
 						break;
 					case _responses.LEFT:
-						response = _responses.LEFT;
+						_currentDirection = _responses.LEFT;
 						break;
 					case _responses.RIGHT:
-						response = _responses.RIGHT;
+						_currentDirection = _responses.RIGHT;
 						break;
 					default:
 						break;
@@ -179,31 +154,14 @@ ParticipantHelper.onmessage = message => {
 			}
 		}
 	}
-	if(!possibleResponses.includes(response) && 0 < possibleResponses.length){
-		response = possibleResponses[Math.floor(Math.random()*possibleResponses.length)];
+	if(!possibleResponses.includes(_currentDirection) && 0 < possibleResponses.length){
+		_currentDirection = possibleResponses[Math.floor(Math.random()*possibleResponses.length)];
 	}
-	message.respond(response);
-	switch(response){
-		case _responses.LEFT:
-			switch(_currentDirection){
-				case _responses.UP: _currentDirection = _responses.LEFT; break;
-				case _responses.DOWN: _currentDirection = _responses.RIGHT; break;
-				case _responses.LEFT: _currentDirection = _responses.DOWN; break;
-				case _responses.RIGHT: _currentDirection = _responses.UP; break;
-			}
-			break;
-		case _responses.RIGHT:
-			switch(_currentDirection){
-				case _responses.UP: _currentDirection = _responses.RIGHT; break;
-				case _responses.DOWN: _currentDirection = _responses.LEFT; break;
-				case _responses.LEFT: _currentDirection = _responses.UP; break;
-				case _responses.RIGHT: _currentDirection = _responses.DOWN; break;
-			}
-			break;
-	}
+	message.respond(_currentDirection);
+	if(_team===2){console.log(_currentDirection)}
 	switch(_currentDirection){
 		case _responses.FORWARD: _pos.y++; break;
-		case _responses.BACKWARDS: _pos.y++; break;
+		case _responses.BACKWARDS: _pos.y--; break;
 		case _responses.LEFT: _pos.x--; break;
 		case _responses.RIGHT: _pos.x++; break;
 		case _responses.UP: _pos.z++; break;
