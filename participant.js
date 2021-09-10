@@ -26,7 +26,7 @@ function isSpaceOpen(data, x, y, z){
 		if(column){
 			let space = column[y];
 			if(space){
-				return space.occupiedBy === null;
+				return space.occupiedBy === null || space.occupiedBy.isLastTrailingBody;
 			}
 		}
 	}
@@ -61,10 +61,10 @@ function getPossibleResponses(data, pos){
 		possibleResponses.push(_responses.LEFT);
 	}
 	if(_currentDirection !== _responses.DOWN && isSpaceOpen(data, pos.x, pos.y, pos.z+1)){
-//		possibleResponses.push(_responses.UP);
+		possibleResponses.push(_responses.UP);
 	}
 	if(_currentDirection !== _responses.UP && isSpaceOpen(data, pos.x, pos.y, pos.z-1)){
-//		possibleResponses.push(_responses.DOWN);
+		possibleResponses.push(_responses.DOWN);
 	}
 	return possibleResponses;
 }
@@ -97,6 +97,8 @@ ParticipantHelper.onmessage = message => {
 		dirOptions.push({dir: _responses.BACKWARDS, nextDistance: Math.abs(dx)+Math.abs(dy+1)+Math.abs(dz)});
 		dirOptions.push({dir: _responses.RIGHT, nextDistance: Math.abs(dx-1)+Math.abs(dy)+Math.abs(dz)});
 		dirOptions.push({dir: _responses.LEFT, nextDistance: Math.abs(dx+1)+Math.abs(dy)+Math.abs(dz)});
+		dirOptions.push({dir: _responses.UP, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz-1)});
+		dirOptions.push({dir: _responses.DOWN, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz+1)});
 		dirOptions.forEach(option => option.sort = option.nextDistance + Math.random()); // Shuffle equal distance.
 		let possibleResponses = getPossibleResponses(data, pos);
 		for(const option of dirOptions.sort((o1, o2) => o1.sort - o2.sort)){
