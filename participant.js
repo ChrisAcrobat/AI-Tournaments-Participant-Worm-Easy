@@ -71,6 +71,9 @@ function getPossibleResponses(data, pos){
 ParticipantHelper.onmessage = message => {
 	let data = message.data;
 	let pos = getPos(data);
+	if(!pos){
+		throw new Error('Position not found.');
+	}
 	if(!_target || !data[_target.pos_z][_target.pos_x][_target.pos_y].eatables.apple){
 		let eatables = [];
 		data.forEach((height, z) => {
