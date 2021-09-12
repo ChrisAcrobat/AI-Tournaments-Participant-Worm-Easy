@@ -69,6 +69,9 @@ function getPossibleResponses(data, pos){
 	return possibleResponses;
 }
 ParticipantHelper.onmessage = message => {
+	if(message.type !== 'Post'){
+		return;
+	}
 	let data = message.data;
 	let pos = getPos(data);
 	if(!pos){
