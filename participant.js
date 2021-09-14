@@ -39,7 +39,7 @@ function getPos(data){
 			const column = height[x];
 			for(const y in column){
 				const space = column[y];
-				if(space.occupiedBy !== null && space.occupiedBy.team === _team && space.occupiedBy.type === 'SolidWorm'){
+				if(space.occupiedBy && space.occupiedBy.team === _team && space.occupiedBy.type === 'SolidWorm'){
 					return {x: parseInt(x), y: parseInt(y), z: parseInt(z)};
 				}
 			}
@@ -115,13 +115,5 @@ ParticipantHelper.onmessage = message => {
 		}
 	}
 	message.respond(_currentDirection);
-	switch(_currentDirection){
-		case _responses.FORWARD: pos.y++; break;
-		case _responses.BACKWARDS: pos.y--; break;
-		case _responses.LEFT: pos.x--; break;
-		case _responses.RIGHT: pos.x++; break;
-		case _responses.UP: pos.z++; break;
-		case _responses.DOWN: pos.z--; break;
-	}
 	_tick++;
 }
