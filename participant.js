@@ -14,11 +14,6 @@ let _responses = {
 }
 let _currentDirection = _responses.FORWARD;
 let _target = null;
-ParticipantHelper.init = (settings, opponents) => {
-	_team = opponents.findIndex(opponent=>opponent===null);
-	_settings = settings;
-	_opponents = opponents;
-}
 function isSpaceOpen(data, x, y, z){
 	let layer = data[z];
 	if(layer){
@@ -68,52 +63,57 @@ function getPossibleResponses(data, pos){
 	}
 	return possibleResponses;
 }
-ParticipantHelper.onmessage = message => {
-	if(message.type !== 'Post'){
-		return;
-	}
-	let data = message.data;
-	let pos = getPos(data);
-	if(!pos){
-		throw new Error('Position not found.');
-	}
-	if(!_target || !data[_target.pos_z][_target.pos_x][_target.pos_y].eatables.apple){
-		let eatables = [];
-		data.forEach((height, z) => {
-			height.forEach((column, x) => {
-				column.forEach((space, y) => {
-					if(space.eatables.apple || 0 < space.eatables.other){
-						let e = {distance: Math.abs(pos.x-x)+Math.abs(pos.y-y)+Math.abs(pos.z-z), eatables: space.eatables.other, pos_z: z, pos_x: x, pos_y: y};
-						if(space.eatables.apple){
-							e.eatables++;
+onmessage = init => {
+	_settings = init.settings;
+	_opponents = init.opponents;
+	_team = _opponents.findIndex(opponent=>opponent===null);
+	onmessage = message => {
+		if(message.type !== 'Post'){
+			return;
+		}
+		let data = message.data;
+		let pos = getPos(data);
+		if(!pos){
+			throw new Error('Position not found.');
+		}
+		if(!_target || !data[_target.pos_z][_target.pos_x][_target.pos_y].eatables.apple){
+			let eatables = [];
+			data.forEach((height, z) => {
+				height.forEach((column, x) => {
+					column.forEach((space, y) => {
+						if(space.eatables.apple || 0 < space.eatables.other){
+							let e = {distance: Math.abs(pos.x-x)+Math.abs(pos.y-y)+Math.abs(pos.z-z), eatables: space.eatables.other, pos_z: z, pos_x: x, pos_y: y};
+							if(space.eatables.apple){
+								e.eatables++;
+							}
+							eatables.push(e);
 						}
-						eatables.push(e);
-					}
+					});
 				});
 			});
-		});
-		_target = eatables[Math.floor(Math.random()*eatables.length)];
-	}
-	let dirOptions = [];
-	if(_target){
-		let dx = _target.pos_x-pos.x;
-		let dy = _target.pos_y-pos.y;
-		let dz = _target.pos_z-pos.z;
-		dirOptions.push({dir: _responses.FORWARD, nextDistance: Math.abs(dx)+Math.abs(dy-1)+Math.abs(dz)});
-		dirOptions.push({dir: _responses.BACKWARDS, nextDistance: Math.abs(dx)+Math.abs(dy+1)+Math.abs(dz)});
-		dirOptions.push({dir: _responses.RIGHT, nextDistance: Math.abs(dx-1)+Math.abs(dy)+Math.abs(dz)});
-		dirOptions.push({dir: _responses.LEFT, nextDistance: Math.abs(dx+1)+Math.abs(dy)+Math.abs(dz)});
-		dirOptions.push({dir: _responses.UP, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz-1)});
-		dirOptions.push({dir: _responses.DOWN, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz+1)});
-		dirOptions.forEach(option => option.sort = option.nextDistance + Math.random()); // Shuffle equal distance.
-		let possibleResponses = getPossibleResponses(data, pos);
-		for(const option of dirOptions.sort((o1, o2) => o1.sort - o2.sort)){
-			if(possibleResponses.includes(option.dir)){
-				_currentDirection = option.dir;
-				break
+			_target = eatables[Math.floor(Math.random()*eatables.length)];
+		}
+		let dirOptions = [];
+		if(_target){
+			let dx = _target.pos_x-pos.x;
+			let dy = _target.pos_y-pos.y;
+			let dz = _target.pos_z-pos.z;
+			dirOptions.push({dir: _responses.FORWARD, nextDistance: Math.abs(dx)+Math.abs(dy-1)+Math.abs(dz)});
+			dirOptions.push({dir: _responses.BACKWARDS, nextDistance: Math.abs(dx)+Math.abs(dy+1)+Math.abs(dz)});
+			dirOptions.push({dir: _responses.RIGHT, nextDistance: Math.abs(dx-1)+Math.abs(dy)+Math.abs(dz)});
+			dirOptions.push({dir: _responses.LEFT, nextDistance: Math.abs(dx+1)+Math.abs(dy)+Math.abs(dz)});
+			dirOptions.push({dir: _responses.UP, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz-1)});
+			dirOptions.push({dir: _responses.DOWN, nextDistance: Math.abs(dx)+Math.abs(dy)+Math.abs(dz+1)});
+			dirOptions.forEach(option => option.sort = option.nextDistance + Math.random()); // Shuffle equal distance.
+			let possibleResponses = getPossibleResponses(data, pos);
+			for(const option of dirOptions.sort((o1, o2) => o1.sort - o2.sort)){
+				if(possibleResponses.includes(option.dir)){
+					_currentDirection = option.dir;
+					break
+				}
 			}
 		}
+		postMessage(_currentDirection);
+		_tick++;
 	}
-	message.respond(_currentDirection);
-	_tick++;
 }
